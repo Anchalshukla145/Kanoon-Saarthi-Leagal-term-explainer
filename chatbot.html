@@ -5,11 +5,132 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Legal Terms Explainer | कानूनी शब्दों की व्याख्या</title>
     <link rel="stylesheet" href="chatbot.css">
+    <style>
+        /* Add some basic styling for loading/error messages */
+        .api-info {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            min-height: 50px; /* Ensure space is reserved */
+            background-color: #f9f9f9;
+            white-space: pre-wrap; /* Preserve whitespace and newlines from API */
+            word-wrap: break-word; /* Break long words */
+        }
+        .api-info.loading {
+            color: #888;
+        }
+        .api-info.error {
+            color: #d9534f;
+            background-color: #f2dede;
+            border-color: #ebccd1;
+        }
+        body[data-theme="dark"] .api-info {
+             background-color: #333;
+             border-color: #555;
+             color: #eee;
+        }
+         body[data-theme="dark"] .api-info.error {
+             color: #f2baba;
+             background-color: #a94442;
+             border-color: #d68a8a;
+        }
+
+        /* Basic Navbar Styling (if not fully in chatbot.css) */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            border-bottom: 1px solid #ccc;
+        }
+        .nav-brand {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .nav-items-right {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Add some space between items */
+        }
+        body[data-theme="dark"] .navbar {
+            background-color: #222;
+            border-bottom: 1px solid #444;
+            color: #eee;
+        }
+         /* Basic Button Styling */
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #eee;
+        }
+         body[data-theme="dark"] button {
+            background-color: #555;
+            color: #eee;
+            border-color: #777;
+         }
+         body[data-theme="dark"] button:hover {
+            background-color: #666;
+         }
+         /* Basic Input Styling */
+        input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+         body[data-theme="dark"] input[type="text"] {
+             background-color: #444;
+             color: #eee;
+             border-color: #777;
+         }
+         /* Basic Select Styling */
+         select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+         }
+         body[data-theme="dark"] select {
+             background-color: #444;
+             color: #eee;
+             border-color: #777;
+         }
+
+         /* Style Credits */
+         .credits {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #555;
+            text-align: center;
+         }
+          body[data-theme="dark"] .credits {
+             color: #aaa;
+          }
+          /* More words link */
+        .more-words-link {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.95em;
+        }
+        .more-words-link img {
+            width: 32px; /* Adjust size as needed */
+            height: 32px;
+            vertical-align: middle;
+            margin-left: 5px;
+            transition: transform 0.2s ease-in-out;
+        }
+         .more-words-link a:hover img {
+            transform: scale(1.1);
+         }
+    </style>
 </head>
 <body data-theme="light">
     <nav class="navbar">
-        <div class="nav-brand">KanoonSaarthi ⚖️
-        </div>
+        <div class="nav-brand">KanoonSaarthi ⚖️</div>
         <div class="nav-items-right">
             <select id="languageSelect">
                 <option value="en">English</option>
@@ -18,39 +139,222 @@
             <button id="themeToggle">Switch to Dark Mode</button>
         </div>
     </nav>
-    
 
     <div class="container">
-        <h1>Legal Terms Explainer | कानूनी शब्दों की व्याख्या</h1>
-        
-        <div class="search-container">
-            <input type="text" class="search-box" id="searchInput" placeholder="Enter legal term | कानूनी शब्द दर्ज करें...">
-            <button id="searchBtn">Explain | व्याख्या करें</button>
-        </div>
-    
-        <div id="termsList"></div>
-    
-        <div class="api-info" id="apiInfo">
-            <p>Enter a term to get an explanation | एक शब्द दर्ज करें</p>
-        </div>
-    
-        
-        <!-- More Words Link -->
-<div class="more-words-link">
-    <p>Click here to know more words if not found:</p>
-    <a href="https://dictionary.nolo.com/" target="_blank">
-        <img src="JUSTICE.png" alt="Justice Icon">
-    </a>
-</div>
+        <h1 id="pageTitle">Legal Terms Explainer</h1>
 
-<!-- Credits Section -->
-    <div class="credits">
-    <p>Made by - Anchal Shukla, Shivnandan, Vikas</p>
-    <p>Registration number: 123456789</p>
+        <div class="search-container">
+            <input type="text" class="search-box" id="searchInput" placeholder="Enter legal term...">
+            <button id="searchBtn">Explain</button>
+        </div>
+
+        <!-- This div seems unused if fetching from API, maybe remove or repurpose? -->
+        <!-- <div id="termsList"></div> -->
+
+        <div class="api-info" id="apiInfo">
+            <p id="apiInfoPlaceholder">Enter a term to get an explanation.</p>
+        </div>
+
+        <!-- More Words Link -->
+        <div class="more-words-link">
+            <p id="moreWordsText">Click here to know more words if not found:</p>
+            <a href="https://dictionary.nolo.com/" target="_blank" rel="noopener noreferrer">
+                <img src="JUSTICE.png" alt="Justice Icon"> <!-- Make sure JUSTICE.png is in the same folder or provide correct path -->
+            </a>
+        </div>
+
+        <!-- Credits Section -->
+        <div class="credits">
+            <p>Made by - Anchal Shukla, Shivnandan, Vikas</p>
+            <p>Registration number: 123456789</p>
         </div>
 
     </div> <!-- end of .container -->
 
-    <script src="chatbot.js"></script>
+    <script>
+        // --- DOM Elements ---
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const apiInfoDiv = document.getElementById('apiInfo');
+        const languageSelect = document.getElementById('languageSelect');
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+
+        // UI Text Translations
+        const translations = {
+            en: {
+                title: "Legal Terms Explainer",
+                searchPlaceholder: "Enter legal term...",
+                searchButton: "Explain",
+                apiInfoPlaceholder: "Enter a term to get an explanation.",
+                moreWords: "Click here to know more words if not found:",
+                switchToDark: "Switch to Dark Mode",
+                switchToLight: "Switch to Light Mode",
+                loading: "Loading explanation...",
+                error: "Error fetching explanation. Please try again.",
+                noTerm: "Please enter a legal term.",
+                promptPrefix: "Explain the legal term",
+                promptSuffix: "clearly and concisely, suitable for a layperson. If the term is ambiguous, provide the most common legal meaning."
+            },
+            hi: {
+                title: "कानूनी शब्दों की व्याख्या",
+                searchPlaceholder: "कानूनी शब्द दर्ज करें...",
+                searchButton: "व्याख्या करें",
+                apiInfoPlaceholder: "व्याख्या प्राप्त करने के लिए एक शब्द दर्ज करें।",
+                moreWords: "यदि शब्द न मिले तो अधिक शब्दों के लिए यहां क्लिक करें:",
+                switchToDark: "डार्क मोड में बदलें",
+                switchToLight: "लाइट मोड में बदलें",
+                loading: "व्याख्या लोड हो रही है...",
+                error: "व्याख्या प्राप्त करने में त्रुटि। कृपया पुनः प्रयास करें।",
+                noTerm: "कृपया एक कानूनी शब्द दर्ज करें।",
+                promptPrefix: "कानूनी शब्द की व्याख्या करें:",
+                promptSuffix: "स्पष्ट और संक्षिप्त रूप से, आम आदमी के लिए उपयुक्त। यदि शब्द अस्पष्ट है, तो सबसे सामान्य कानूनी अर्थ प्रदान करें।"
+            }
+        };
+
+        // --- Language Switching ---
+        function setLanguage(lang) {
+            const t = translations[lang];
+            document.title = t.title; // Update page title too
+            document.documentElement.lang = lang; // Update html lang attribute
+            document.getElementById('pageTitle').textContent = t.title;
+            searchInput.placeholder = t.searchPlaceholder;
+            searchBtn.textContent = t.searchButton;
+            document.getElementById('apiInfoPlaceholder').textContent = t.apiInfoPlaceholder;
+            document.getElementById('moreWordsText').textContent = t.moreWords;
+            // Update theme toggle button text based on current theme
+            const currentTheme = body.getAttribute('data-theme');
+            themeToggle.textContent = currentTheme === 'dark' ? t.switchToLight : t.switchToDark;
+
+             // Update initial placeholder text if no explanation loaded yet
+            if (apiInfoDiv.querySelector('#apiInfoPlaceholder')) {
+                 apiInfoDiv.innerHTML = `<p id="apiInfoPlaceholder">${t.apiInfoPlaceholder}</p>`;
+            }
+        }
+
+        languageSelect.addEventListener('change', (event) => {
+            setLanguage(event.target.value);
+        });
+
+        // --- Theme Switching ---
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+
+            // Update button text based on the *new* theme and current language
+            const lang = languageSelect.value;
+            const t = translations[lang];
+            themeToggle.textContent = newTheme === 'dark' ? t.switchToLight : t.switchToDark;
+        });
+
+        // --- Gemini API Call ---
+        searchBtn.addEventListener('click', async () => {
+            const term = searchInput.value.trim();
+            const lang = languageSelect.value;
+            const t = translations[lang]; // Get translations for the selected language
+
+            if (!term) {
+                apiInfoDiv.textContent = t.noTerm;
+                apiInfoDiv.className = 'api-info error'; // Add error class
+                return;
+            }
+
+            // !! SECURITY WARNING !!
+            // !! Avoid embedding API keys directly in client-side code for production environments.
+            // !! Use a backend proxy server instead. Replace with your key ONLY for local testing.
+            const GEMINI_API_KEY = "AIzaSyDUpQJZyCn2uXLbNew40kxYFpLgpDWfISs"; // <--- REPLACE ONLY FOR LOCAL TEST
+
+            if (GEMINI_API_KEY === "YOUR_GEMINI_API_KEY") {
+                 apiInfoDiv.textContent = "API Key not set. Please configure it in the script.";
+                 apiInfoDiv.className = 'api-info error';
+                 console.error("Gemini API Key is not set in the script.");
+                 return;
+            }
+
+
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+            // Construct the prompt
+            const prompt = `${t.promptPrefix} "${term}" ${lang === 'hi' ? 'in Hindi' : 'in English'}. ${t.promptSuffix}`;
+
+            // Prepare request body
+            const requestBody = {
+                contents: [{
+                    parts: [{ "text": prompt }]
+                }]
+                // You can add generationConfig here if needed (e.g., temperature, maxOutputTokens)
+                // "generationConfig": {
+                //   "temperature": 0.7,
+                //   "maxOutputTokens": 500
+                // }
+            };
+
+            // Update UI - Show loading state
+            apiInfoDiv.textContent = t.loading;
+            apiInfoDiv.className = 'api-info loading'; // Add loading class
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody),
+                });
+
+                if (!response.ok) {
+                    // Try to get error details from Gemini response if possible
+                    let errorDetails = `HTTP error! status: ${response.status}`;
+                    try {
+                        const errorData = await response.json();
+                        console.error("Gemini API Error Response:", errorData);
+                        errorDetails += ` - ${errorData?.error?.message || 'Unknown API error'}`;
+                    } catch (e) {
+                        // Ignore if response is not JSON or empty
+                        console.error("Failed to parse error response:", e);
+                    }
+                    throw new Error(errorDetails);
+                }
+
+                const data = await response.json();
+                console.log("Gemini API Success Response:", data); // For debugging
+
+                // Extract the generated text
+                // Check if candidates exist and have the expected structure
+                if (data.candidates && data.candidates.length > 0 &&
+                    data.candidates[0].content && data.candidates[0].content.parts &&
+                    data.candidates[0].content.parts.length > 0)
+                {
+                    const explanation = data.candidates[0].content.parts[0].text;
+                    apiInfoDiv.textContent = explanation;
+                    apiInfoDiv.className = 'api-info'; // Remove loading/error class
+                } else {
+                     // Handle cases where the API response structure is unexpected or content is missing
+                     console.error("Unexpected API response structure:", data);
+                     apiInfoDiv.textContent = t.error + " (Unexpected API response format)";
+                     apiInfoDiv.className = 'api-info error';
+                }
+
+            } catch (error) {
+                console.error('Error fetching explanation:', error);
+                apiInfoDiv.textContent = `${t.error} (${error.message})`;
+                apiInfoDiv.className = 'api-info error'; // Add error class
+            }
+        });
+
+        // --- Initial Setup ---
+        // Set initial language based on select default
+        setLanguage(languageSelect.value);
+        // Set initial theme button text
+        const initialTheme = body.getAttribute('data-theme') || 'light'; // default to light if not set
+        body.setAttribute('data-theme', initialTheme); // Ensure attribute is set
+        const initialLang = languageSelect.value;
+        themeToggle.textContent = initialTheme === 'dark'
+            ? translations[initialLang].switchToLight
+            : translations[initialLang].switchToDark;
+
+    </script>
+
 </body>
 </html>
