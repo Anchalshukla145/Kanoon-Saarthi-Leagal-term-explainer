@@ -16,7 +16,7 @@
 - 🌗 **Theme Toggle**: Switch between light and dark mode for better accessibility.
 - 🌐 **Language Switcher**: Instantly translate terms between English and Hindi.
 - 📖 **Extended Learning**: Redirects to [Nolo Legal Dictionary](https://dictionary.nolo.com/) for broader legal vocabulary.
-- 🧠 **Glossary Support**: Covers 150+ legal terms including `bail`, `affidavit`, `witness`, `jurisdiction`, etc.
+- 🧠 **Open ai Api Support**: Successfully api integrated fetch your meaning of word and also tells whether a leagal term or not.
 - ⚖️ **Justice Symbol Button**: A clickable icon that takes you to an external page containing more legal terms not listed in the chatbot's database.
 
 ---
